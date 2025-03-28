@@ -17,8 +17,8 @@ FirstAidMate is a user-friendly mobile application designed to provide quick acc
 - **AI-Powered Chatbot** – Advanced first aid responses using machine learning.
 
 ## Technologies Used
-- **Frontend:** React Native (cross-platform for Android & iOS)
-- **Backend:** Node.js with Express API
+- **Frontend:** Flask
+- **Backend:** Meta API, Google API
 - **Database:** Firebase Firestore or PostgreSQL
 - **Authentication:** Firebase Authentication / OAuth
 - **Maps Integration:** Google Maps API for hospital location services
