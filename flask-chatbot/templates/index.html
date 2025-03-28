@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI First Aid Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <h1><i class="fas fa-first-aid"></i> First Aid Assistant</h1>
+            <div class="emergency-contact">
+                <button id="emergency-btn"><i class="fas fa-phone-emergency"></i> Emergency</button>
+                <div class="emergency-numbers">
+                    <p><i class="fas fa-phone"></i> US: 911</p>
+                    <p><i class="fas fa-phone"></i> UK: 999</p>
+                    <p><i class="fas fa-phone"></i> EU: 112</p>
+                    <p><i class="fas fa-ambulance"></i> Ambulance: Local Number</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-box" id="chat-box">
+            <div class="bot-message">
+                <div class="avatar"><i class="fas fa-robot"></i></div>
+                <div class="message-content">
+                    <p>Hello! I'm your AI First Aid Assistant. I can:</p>
+                    <ul>
+                        <li>Analyze injuries from descriptions</li>
+                        <li>Provide step-by-step first aid guidance</li>
+                        <li>Assess photos of injuries</li>
+                        <li>Help you decide if you need emergency care</li>
+                    </ul>
+                    <p>What do you need help with today?</p>
+                </div>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <form id="chat-form">
+                <div class="input-group">
+                    <label for="image-upload" class="upload-btn" title="Upload injury photo">
+                        <i class="fas fa-camera"></i>
+                        <input id="image-upload" type="file" name="image" accept="image/*" capture="environment">
+                    </label>
+                    <input type="text" id="user-input" name="user_message" placeholder="Describe your injury..." autocomplete="off">
+                    <button type="submit" id="send-button"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatForm = document.getElementById('chat-form');
+            const userInput = document.getElementById('user-input');
+            const imageUpload = document.getElementById('image-upload');
+            const chatBox = document.getElementById('chat-box');
+            const emergencyBtn = document.getElementById('emergency-btn');
+            
+            // Add message to chat
+            function addMessage(content, isUser, isImage = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = isUser ? 'user-message' : 'bot-message';
+                
+                const timeString = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                if (isUser) {
+                    messageDiv.innerHTML = `
+                        <div class="message-bubble user">
+                            <div class="message-content">
+                                ${isImage ? `<img src="${content}" alt="Uploaded injury" class="uploaded-image">` : content}
+                            </div>
+                            <div class="message-time">${timeString}</div>
+                        </div>
+                    `;
+                } else {
+                    // Format response with proper line breaks
+                    const formattedContent = content
+                        .replace(/\n/g, '<br>')
+                        .replace(/(\d+)\./g, '<br><span class="step-number">$1.</span>');
+                    
+                    messageDiv.innerHTML = `
+                        <div class="message-bubble bot">
+                            <div class="avatar"><i class="fas fa-robot"></i></div>
+                            <div class="message-content">${formattedContent}</div>
+                            <div class="message-time">${timeString}</div>
+                        </div>
+                    `;
+                }
+                
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+            
+            // Show typing indicator
+            function showTyping() {
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'bot-message typing';
+                typingIndicator.innerHTML = `
+                    <div class="avatar"><i class="fas fa-robot"></i></div>
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                `;
+                chatBox.appendChild(typingIndicator);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                return typingIndicator;
+            }
+            
+            // Handle form submission
+            async function handleSubmit(e) {
+                e.preventDefault();
+                
+                const message = userInput.value.trim();
+                const imageFile = imageUpload.files[0];
+                
+                if (!message && !imageFile) {
+                    showSystemMessage("Please describe your injury or upload a photo");
+                    return;
+                }
+                
+                // Clear inputs
+                userInput.value = '';
+                imageUpload.value = '';
+                
+                // Show user message/image
+                if (message) addMessage(message, true);
+                if (imageFile) {
+                    const imageUrl = URL.createObjectURL(imageFile);
+                    addMessage(imageUrl, true, true);
+                }
+                
+                // Show typing indicator
+                const typingIndicator = showTyping();
+                
+                try {
+                    const formData = new FormData(chatForm);
+                    
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    // Always remove typing indicator
+                    chatBox.removeChild(typingIndicator);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Server responded with ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    // Show bot response
+                    if (data.image_url) {
+                        addMessage(`/static/${data.image_url}`, false, true);
+                    }
+                    addMessage(data.bot_response, false);
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    addMessage("I'm having trouble responding. Please try again or call emergency services if this is urgent.", false);
+                }
+            }
+            
+            function showSystemMessage(message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'system-message';
+                messageDiv.textContent = message;
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+            
+            // Event listeners
+            chatForm.addEventListener('submit', handleSubmit);
+            
+            emergencyBtn.addEventListener('click', function() {
+                document.querySelector('.emergency-numbers').classList.toggle('show');
+            });
+            
+            // Allow Enter to submit (but Shift+Enter for new line)
+            userInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    chatForm.dispatchEvent(new Event('submit'));
+                }
+            });
+            
+            // Drag and drop for images
+            chatBox.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                chatBox.classList.add('drag-over');
+            });
+            
+            chatBox.addEventListener('dragleave', () => {
+                chatBox.classList.remove('drag-over');
+            });
+            
+            chatBox.addEventListener('drop', (e) => {
+                e.preventDefault();
+                chatBox.classList.remove('drag-over');
+                
+                if (e.dataTransfer.files.length) {
+                    imageUpload.files = e.dataTransfer.files;
+                    chatForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
