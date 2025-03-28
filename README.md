@@ -28,7 +28,7 @@ FirstAidMate is a user-friendly mobile application designed to provide quick acc
 1. Clone the repository:
    ```sh
    git clone https://github.com/sreeyachatterjee/HoC2_OI_DifferentialCoders.git
-   cd firstaidmate
+   cd HoC2_OI_DifferentialCoders
    ```
 2. Install dependencies:
    ```sh
