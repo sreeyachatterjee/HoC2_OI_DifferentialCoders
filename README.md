@@ -16,12 +16,22 @@
 
 **Key Features**
 - 🎙️ **Voice input** via microphone (Groq Whisper transcription)
+ ![WhatsApp Image 2025-08-25 at 17 49 55_af0897c5](https://github.com/user-attachments/assets/05e55d19-8164-4921-acb6-a8f78c113659)
 - 🖼️ **Optional image input** (Groq multimodal models)
+  
+  ![WhatsApp Image 2025-08-25 at 17 49 55_70215fdb](https://github.com/user-attachments/assets/3195a0e4-90f3-4137-bd5e-829df4144858)
+
 - 🧠 **Model ensembling** (multiple text/vision models + judge model)
 - 🔊 **Cross-platform TTS** (ElevenLabs for EN, gTTS for HI/KN, optional playback)
 - 🌍 **Nearby hospitals tab** (IP geolocation → JSON via LLM)
+  ![WhatsApp Image 2025-08-25 at 17 49 55_24bbdc67](https://github.com/user-attachments/assets/e171df56-b547-4eb2-8270-09b5bee1140c)
+
 - 📜 **Conversation history tab** (auto-logged to JSON)
+  ![WhatsApp Image 2025-08-25 at 17 49 56_d44cb6eb](https://github.com/user-attachments/assets/233fe7c5-ab21-4d9b-b311-b56f6d6678a8)
+
 - 📞 **Emergency contacts tab**
+  ![WhatsApp Image 2025-08-25 at 17 49 55_4bfdb80b](https://github.com/user-attachments/assets/07c714fc-8eb9-4597-8d49-0340cd94fd8a)
+
 - 🐳 **Docker support** (with ffmpeg preinstalled)
 
 
