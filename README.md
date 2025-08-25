@@ -49,6 +49,3 @@ FirstAidMate is a user-friendly mobile application designed to provide quick acc
 ## License
 This project is licensed under the **MIT License**. See the `LICENSE` file for details.
 
-## Contact
-For questions, issues, or support, contact **sreeya.chatterjee10@gmail.com**.
-
