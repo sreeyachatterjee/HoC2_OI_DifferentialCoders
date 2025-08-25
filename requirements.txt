@@ -1,0 +1,9 @@
+gradio>=4.44
+groq>=0.9
+pydub>=0.25
+SpeechRecognition>=3.10
+elevenlabs>=1.5
+gTTS>=2.5
+geopy>=2.4
+requests>=2.32
+simpleaudio>=1.0
